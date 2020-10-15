@@ -15,6 +15,8 @@ async def main():
     response = await protocol.request(get_rd_req).response
     linkformat = parse(response.payload.decode('ascii'))
     rd_data = json.loads(linkformat.as_json_string())
+
+    print('%s' % linkformat)
     
     for resource in rd_data:
         print('%s%s' % (response.remote.uri_base, resource['href']))

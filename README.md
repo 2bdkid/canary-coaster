@@ -14,3 +14,7 @@ pip3 install --user LinkFormat
 chmod +x server.py
 ./server.py --dout X --pd_sck Y  # GPIO pins X, Y
 ```
+
+## get_well-known_core.py
+
+This script sends a GET to /.well-known/core and displays links sent back
