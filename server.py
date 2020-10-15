@@ -67,7 +67,7 @@ def main():
 
     root = Site()
     root.add_resource(['.well-known', 'core'],
-                      WKCResource(root.get_resources_as_linkheader))
+                      WKCResource(root.get_resources_as_linkheader, impl_info=None))
     root.add_resource(['weight'], LoadCellSensor(hx711, 1))
 
     asyncio.get_event_loop().create_task(Context.create_server_context(root))
