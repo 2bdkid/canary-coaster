@@ -3,10 +3,7 @@
 ## CoAP Server
 
 ```
-git clone https://github.com/tatobari/hx711py.git
-cd hx711py
-python3 setup.py install --prefix=$HOME/.local/
-cd ..
+pip3 install --user hx711
 chmod +x server.py
 ./server.py --dout X --pd_sck Y  # GPIO pins X, Y
 
