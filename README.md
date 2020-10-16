@@ -26,7 +26,9 @@ Note: This is hardcoded to run on the well-known CoAP port
 python3 -m aiocoap.cli.rd
 ```
 
-## query_resource_directory.py
+To test the RD
 
-Sends a GET /resource-lookup/?rt=... to the RD and prints the result
+```
+aiocoap-client coap://localhost/resource-lookup?temperature
+```
 
