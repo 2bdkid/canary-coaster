@@ -6,6 +6,8 @@ from aiocoap import CONTENT
 from aiocoap.resource import Site
 from aiocoap.resource import ObservableResource
 from aiocoap.resource import WKCResource
+from aiocoap.resourcedirectory.client.register import Registerer
+from aiocoap.numbers.constants import COAP_PORT
 from hx711 import HX711
 
 import argparse
@@ -22,6 +24,7 @@ class LoadCellSensor(ObservableResource):
         self._poll_period = poll_period
         self._hx711 = hx711
         self._handle = None
+        self.rt = 'load weight'
 
     """ handles GET requests """
     async def render_get(self, request):
@@ -58,21 +61,32 @@ def get_command_line_arguments():
                         help='GPIO pin: forwarded to HX711 constructor', required=True)
     parser.add_argument('--pd_sck', dest='pd_sck', type=int,
                         help='GPIO pin: forwarded to HX711 constructor', required=True)
+    parser.add_argument('--port', dest='port', type=int, help='CoAP port', default=COAP_PORT)
+    parser.add_argument('--rd', dest='rd', help='Resource directory base uri', default='coap://localhost')
+    parser.add_argument('--ep', dest='ep', help='Endpoint name', default=None)
+    parser.add_argument('--ref-unit', dest='ref_unit', type=float, help='HX711 reference unit', default=1.0)
     return parser.parse_args()
 
 
-def main():
-    args = get_command_line_arguments()
-    hx711 = HX711(args.dout, args.pd_sck)  # TODO: set reference unit
-
+async def start_server(args):
+    hx711 = HX711(args.dout, args.pd_sck)
+    hx711.set_reference_unit(args.ref_unit)
+    
     root = Site()
     root.add_resource(['.well-known', 'core'],
                       WKCResource(root.get_resources_as_linkheader, impl_info=None))
     root.add_resource(['weight'], LoadCellSensor(hx711, 1))
 
-    asyncio.get_event_loop().create_task(Context.create_server_context(root))
-    asyncio.get_event_loop().run_forever()
+    protocol = await Context.create_server_context(root, bind=('::', args.port))
+    registration = Registerer(protocol, rd=args.rd, registration_parameters=dict(ep=args.ep))
 
+
+def main():
+    args = get_command_line_arguments()
+    asyncio.get_event_loop().create_task(start_server())
+    asyncio.get_event_loop().run_forever()
+    
 
 if __name__ == '__main__':
     main()
+
