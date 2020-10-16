@@ -29,6 +29,6 @@ python3 -m aiocoap.cli.rd
 To test the RD
 
 ```
-aiocoap-client coap://localhost/resource-lookup?rt=temperature
+aiocoap-client coap://localhost/resource-lookup/?rt=weight
 ```
 
