@@ -71,7 +71,7 @@ def get_command_line_arguments():
 async def start_server(args):
     hx711 = HX711(args.dout, args.pd_sck)
     hx711.set_reference_unit(args.ref_unit)
-    
+
     root = Site()
     root.add_resource(['.well-known', 'core'],
                       WKCResource(root.get_resources_as_linkheader, impl_info=None))
@@ -85,8 +85,7 @@ def main():
     args = get_command_line_arguments()
     asyncio.get_event_loop().create_task(start_server(args))
     asyncio.get_event_loop().run_forever()
-    
+
 
 if __name__ == '__main__':
     main()
-
