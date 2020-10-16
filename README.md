@@ -10,11 +10,22 @@ cd aiocoap
 pip3 install --user .
 cd ..
 pip3 install --user hx711
-pip3 install --user LinkFormat
 chmod +x server.py
 ./server.py --dout X --pd_sck Y  # GPIO pins X, Y
 ```
 
-## get_well-known_core.py
+## Resource Directory
 
-This script sends a GET to /.well-known/core and displays links sent back
+Going to use aiocoap's implementation
+
+Details: [CoRE Resource Directory](https://tools.ietf.org/html/draft-ietf-core-resource-directory-25)
+Note: This is hardcoded to run on the well-known CoAP port
+
+```
+python3 -m aiocoap.cli.rd
+```
+
+## query_resource_directory.py
+
+Sends a GET coap://localhost/resource-lookup/?rt=... to the RD and print results
+
