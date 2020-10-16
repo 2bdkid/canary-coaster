@@ -83,7 +83,7 @@ async def start_server(args):
 
 def main():
     args = get_command_line_arguments()
-    asyncio.get_event_loop().create_task(start_server())
+    asyncio.get_event_loop().create_task(start_server(args))
     asyncio.get_event_loop().run_forever()
     
 
