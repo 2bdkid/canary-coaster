@@ -2,14 +2,13 @@
 
 ## CoAP Server
 
-The server requires the development version of aiocoap
+The server requires the development version of aiocoap and a port of tatobari/hx711py to Python 3
 
 ```
 git clone https://github.com/chrysn/aiocoap
 cd aiocoap
 pip3 install --user .
 cd ..
-git clone https://github.com/tatobari/hx711py.git
 cd hx711py
 pip3 install --user .
 cd ..
