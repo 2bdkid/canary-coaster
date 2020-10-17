@@ -14,7 +14,14 @@ cd hx711py
 pip3 install --user .
 cd ..
 chmod +x server.py
+./server.py -h  # look at the extra options
 ./server.py --dout X --pd_sck Y  # GPIO pins X, Y
+```
+
+## Test the server
+
+```
+aiocoap-client --observe coap://localhost/weight
 ```
 
 ## Resource Directory
