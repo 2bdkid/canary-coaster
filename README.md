@@ -43,4 +43,7 @@ aiocoap-client coap://localhost/resource-lookup/?rt=weight
 ```
 
 ## Sequence Diagram
+
+Note: This is a slight simplification. The registration process begins with a GET /.well-known/core to the RD, then the server chooses to POST to /resourcedirectory because it's Resource-Type is core.rd
+
 ![Sequence Diagram](sequence.png)
