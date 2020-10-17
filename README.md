@@ -9,7 +9,10 @@ git clone https://github.com/chrysn/aiocoap
 cd aiocoap
 pip3 install --user .
 cd ..
-pip3 install --user hx711
+git clone https://github.com/tatobari/hx711py.git
+cd hx711py
+pip3 install --user .
+cd ..
 chmod +x server.py
 ./server.py --dout X --pd_sck Y  # GPIO pins X, Y
 ```
@@ -32,3 +35,5 @@ To test the RD
 aiocoap-client coap://localhost/resource-lookup/?rt=weight
 ```
 
+## Sequence Diagram
+![Sequence Diagram](sequence.png)
