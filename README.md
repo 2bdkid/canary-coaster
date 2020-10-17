@@ -18,7 +18,7 @@ chmod +x server.py
 ./server.py --dout X --pd_sck Y  # GPIO pins X, Y
 ```
 
-## Test the server
+To test the server
 
 ```
 aiocoap-client --observe coap://localhost/weight
