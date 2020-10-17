@@ -41,7 +41,7 @@ class LoadCellSensor(ObservableResource):
 
     """ read physical load cell """
     def _read_load_cell(self):
-        return self._hx711.read_weight()
+        return self._hx711.get_weight()
 
     """ polling cycle """
     def _poll(self):
@@ -70,6 +70,7 @@ def get_command_line_arguments():
 
 async def start_server(args):
     hx711 = HX711(args.dout, args.pd_sck)
+    hx711.tare()
     hx711.set_reference_unit(args.ref_unit)
 
     root = Site()
