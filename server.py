@@ -41,7 +41,7 @@ class LoadCellSensor(ObservableResource):
 
     """ read physical load cell """
     def _read_load_cell(self):
-        return self._hx711.get_weight()
+        return int(self._hx711.get_weight())
 
     """ polling cycle """
     def _poll(self):
