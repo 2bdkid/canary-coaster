@@ -1,5 +1,9 @@
 #! /usr/bin/env python3
 
+import argparse
+import asyncio
+import struct
+
 from aiocoap import Context
 from aiocoap import Message
 from aiocoap import CONTENT
@@ -9,9 +13,6 @@ from aiocoap.resource import WKCResource
 from aiocoap.resourcedirectory.client.register import Registerer
 from aiocoap.numbers.constants import COAP_PORT
 from hx711 import HX711
-
-import argparse
-import asyncio
 
 
 class LoadCellSensor(ObservableResource):
@@ -28,8 +29,9 @@ class LoadCellSensor(ObservableResource):
 
     """ handles GET requests """
     async def render_get(self, request):
-        weight = self._read_load_cell()
-        return Message(payload=str(weight).encode('ascii'))
+        weightbytes = str(self._read_load_cell()).encode('ascii')
+        netbytes = struct.pack('!%ds' % len(weightbytes), weightbytes)
+        return Message(payload=weightbytes)
 
     """ start/stop polling cycle """
     def update_observation_count(self, count):
@@ -46,8 +48,9 @@ class LoadCellSensor(ObservableResource):
     """ polling cycle """
     def _poll(self):
         self._handle = asyncio.get_event_loop().call_later(self._poll_period, self._poll)
-        weight = self._read_load_cell()
-        message = Message(payload=str(weight).encode('ascii'), code=CONTENT)
+        weightbytes = str(self._read_load_cell()).encode('ascii')
+        netbytes = struct.pack('!%ds' % len(weightbytes), weightbytes)
+        message = Message(payload=netbytes, code=CONTENT)
         self.updated_state(message)
 
     """ initiate polling cycle """
