@@ -29,9 +29,8 @@ class LoadCellSensor(ObservableResource):
 
     """ handles GET requests """
     async def render_get(self, request):
-        weightbytes = str(self._read_load_cell()).encode('ascii')
-        netbytes = struct.pack('!%ds' % len(weightbytes), weightbytes)
-        return Message(payload=netbytes)
+        weight = self._read_load_cell()
+        return Message(payload=struct.pack('!f', weight))
 
     """ start/stop polling cycle """
     def update_observation_count(self, count):
@@ -43,7 +42,7 @@ class LoadCellSensor(ObservableResource):
 
     """ read physical load cell """
     def _read_load_cell(self):
-        return int(self._hx711.get_weight())
+        return self._hx711.get_weight()
 
     """ polling cycle """
     def _poll(self):
