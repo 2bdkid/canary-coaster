@@ -47,9 +47,8 @@ class LoadCellSensor(ObservableResource):
     """ polling cycle """
     def _poll(self):
         self._handle = asyncio.get_event_loop().call_later(self._poll_period, self._poll)
-        weightbytes = str(self._read_load_cell()).encode('ascii')
-        netbytes = struct.pack('!%ds' % len(weightbytes), weightbytes)
-        message = Message(payload=netbytes, code=CONTENT)
+        weight = self._read_load_cell()
+        message = Message(payload=struct.pack('!f', weight), code=CONTENT)
         self.updated_state(message)
 
     """ initiate polling cycle """
