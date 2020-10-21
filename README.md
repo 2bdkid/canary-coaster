@@ -42,6 +42,18 @@ To test the RD (once CoAP server has registered)
 aiocoap-client coap://localhost/resource-lookup/?rt=weight
 ```
 
+## WebSocket Server
+
+WebSocket server can query the Resource Directory for coasters and EndPoint names with these queries
+
+```
+aiocoap-client coap://localhost/endpoint-lookup/?href=coap://[::1]:5686/weight
+# example output: <coap://[::1]:5686/weight>;rt="load weight";obs;anchor="coap://[::1]:5686"
+
+aiocoap-client coap://localhost/endpoint-lookup/?href=coap://[::1]:5686/weight
+# example output: </reg/1/>;ep="brady";base="coap://[::1]:5686";rt="core.rd-ep"
+```
+
 ## UI
 
 When we get to the UI, [cbor-js](https://github.com/paroga/cbor-js) can decode CBOR data sent from the WebSocket server.
