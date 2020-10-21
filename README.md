@@ -44,14 +44,11 @@ aiocoap-client coap://localhost/resource-lookup/?rt=weight
 
 ## WebSocket Server
 
-WebSocket server can query the Resource Directory for coasters and EndPoint names with these queries
+WebSocket server can query the Resource Directory for coasters weight resources and their title
 
 ```
-aiocoap-client coap://localhost/endpoint-lookup/?href=coap://[::1]:5686/weight
-# example output: <coap://[::1]:5686/weight>;rt="load weight";obs;anchor="coap://[::1]:5686"
-
-aiocoap-client coap://localhost/endpoint-lookup/?href=coap://[::1]:5686/weight
-# example output: </reg/1/>;ep="brady";base="coap://[::1]:5686";rt="core.rd-ep"
+aiocoap-client coap://localhost/resource-lookup/?rt=weight
+# example output: <coap://[::1]:5686/weight>;rt="load weight";obs;title="brady";anchor="coap://[::1]:5686"
 ```
 
 ## UI
