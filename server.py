@@ -2,7 +2,7 @@
 
 import argparse
 import asyncio
-import struct
+import cbor2
 
 from aiocoap import Context
 from aiocoap import Message
@@ -30,7 +30,8 @@ class LoadCellSensor(ObservableResource):
     """ handles GET requests """
     async def render_get(self, request):
         weight = self._read_load_cell()
-        return Message(payload=struct.pack('!f', weight))
+        return Message(payload=cbor2.dumps(weight))
+
 
     """ start/stop polling cycle """
     def update_observation_count(self, count):
@@ -48,7 +49,7 @@ class LoadCellSensor(ObservableResource):
     def _poll(self):
         self._handle = asyncio.get_event_loop().call_later(self._poll_period, self._poll)
         weight = self._read_load_cell()
-        message = Message(payload=struct.pack('!f', weight), code=CONTENT)
+        message = Message(payload=cbor2.dumps(weight), code=CONTENT)        
         self.updated_state(message)
 
     """ initiate polling cycle """
