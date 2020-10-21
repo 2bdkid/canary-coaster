@@ -20,12 +20,19 @@ class LoadCellSensor(ObservableResource):
     """ takes HX711 object as input
         poll sensor every poll_period seconds
     """
-    def __init__(self, hx711, poll_period):
+    def __init__(self, hx711, poll_period, title):
         super().__init__()
         self._poll_period = poll_period
         self._hx711 = hx711
         self._handle = None
         self.rt = 'load weight'
+        self.title = title
+
+    """ add title to sensor description """
+    def get_link_description(self):
+        desc = super().get_link_description()
+        desc['title'] = self.title
+        return desc
 
     """ handles GET requests """
     async def render_get(self, request):
@@ -66,8 +73,8 @@ def get_command_line_arguments():
                         help='GPIO pin: forwarded to HX711 constructor', required=True)
     parser.add_argument('--port', dest='port', type=int, help='CoAP port (default: %i)' % COAP_PORT, default=COAP_PORT)
     parser.add_argument('--rd', dest='rd', help='Resource directory base URI (default: coap://localhost)', default='coap://localhost')
-    parser.add_argument('--ep', dest='ep', help='EndPoint name (default: determined by hostname)', default=None)
     parser.add_argument('--ref-unit', dest='ref_unit', type=float, help='HX711 reference unit (default: 1.0)', default=1.0)
+    parser.add_argument('--title', dest='title', help='Resource title given to Resource Directory', default="")
     return parser.parse_args()
 
 
@@ -79,10 +86,10 @@ async def start_server(args):
     root = Site()
     root.add_resource(['.well-known', 'core'],
                       WKCResource(root.get_resources_as_linkheader, impl_info=None))
-    root.add_resource(['weight'], LoadCellSensor(hx711, 1))
+    root.add_resource(['weight'], LoadCellSensor(hx711, 1, args.title))
 
     protocol = await Context.create_server_context(root, bind=('::', args.port))
-    registration = Registerer(protocol, rd=args.rd, registration_parameters=dict(ep=args.ep))
+    registration = Registerer(protocol, rd=args.rd)
 
 
 def main():
