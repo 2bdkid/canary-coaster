@@ -42,6 +42,10 @@ To test the RD (once CoAP server has registered)
 aiocoap-client coap://localhost/resource-lookup/?rt=weight
 ```
 
+## UI
+
+When we get to the UI, [cbor-js](https://github.com/paroga/cbor-js) can decode CBOR data sent from the WebSocket server.
+
 ## Sequence Diagram
 
 Note: This is a slight simplification. The registration process begins with a GET /.well-known/core to the RD, then the server chooses to POST to /resourcedirectory because its Resource-Type is core.rd
