@@ -26,7 +26,6 @@ class LoadCellSensor(ObservableResource):
         self._poll_period = poll_period
         self._hx711 = hx711
         self._handle = None
-        self._lock = asyncio.Lock()
         self.rt = 'load weight'
         self.title = title
 
@@ -43,8 +42,7 @@ class LoadCellSensor(ObservableResource):
 
     """ handles POST i.e. tare command """
     async def render_post(self, request):
-        async with self._lock:
-            self._hx711.tare()
+        self._hx711.tare()
         return Message(code=CHANGED)
 
     """ start/stop polling cycle """
@@ -57,8 +55,7 @@ class LoadCellSensor(ObservableResource):
 
     """ read physical load cell """
     async def _read_load_cell(self):
-        async with self._lock:
-            return self._hx711.get_weight()
+        return self._hx711.get_weight()
 
     """ polling cycle """
     async def _poll(self):
