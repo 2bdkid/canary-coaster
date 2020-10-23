@@ -62,11 +62,11 @@ class LoadCellSensor(ObservableResource):
 
     """ polling cycle """
     async def _poll(self):
-        await asyncio.sleep(self._poll_period)
-        self._handle = asyncio.get_event_loop().create_task(self._poll())
-        weight = await self._read_load_cell()
-        message = Message(payload=cbor2.dumps(weight), code=CONTENT)        
-        self.updated_state(message)
+        while True:
+            await asyncio.sleep(self._poll_period)
+            weight = await self._read_load_cell()
+            message = Message(payload=cbor2.dumps(weight), code=CONTENT)
+            self.updated_state(message)
 
     """ initiate polling cycle """
     def _start_polling(self):
