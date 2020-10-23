@@ -77,12 +77,12 @@ def get_command_line_arguments():
     parser = argparse.ArgumentParser()
     required = parser.add_argument_group('required arguments')
     required.add_argument('--dout', dest='dout', type=int,
-                        help='GPIO pin: forwarded to HX711 constructor', required=True)
+                          help='GPIO pin: forwarded to HX711 constructor', required=True)
     required.add_argument('--pd_sck', dest='pd_sck', type=int,
-                        help='GPIO pin: forwarded to HX711 constructor', required=True)
+                          help='GPIO pin: forwarded to HX711 constructor', required=True)
     parser.add_argument('--port', dest='port', type=int,
                         help='CoAP port (default: %i)' % COAP_PORT, default=COAP_PORT)
-    parser.add_argument('--rd', dest='rd',help='Resource directory base URI (default: coap://localhost)',
+    parser.add_argument('--rd', dest='rd', help='Resource directory base URI (default: coap://localhost)',
                         default='coap://localhost')
     parser.add_argument('--ref-unit', dest='ref_unit', type=float,
                         help='HX711 reference unit (default: 1.0)', default=1.0)
