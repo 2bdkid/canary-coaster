@@ -7,6 +7,7 @@ import cbor2
 from aiocoap import Context
 from aiocoap import Message
 from aiocoap import CONTENT
+from aiocoap import CHANGED
 from aiocoap.resource import Site
 from aiocoap.resource import ObservableResource
 from aiocoap.resource import WKCResource
@@ -25,6 +26,7 @@ class LoadCellSensor(ObservableResource):
         self._poll_period = poll_period
         self._hx711 = hx711
         self._handle = None
+        self._lock = asyncio.Lock()
         self.rt = 'load weight'
         self.title = title
 
@@ -36,9 +38,14 @@ class LoadCellSensor(ObservableResource):
 
     """ handles GET requests """
     async def render_get(self, request):
-        weight = self._read_load_cell()
+        weight = await self._read_load_cell()
         return Message(payload=cbor2.dumps(weight))
 
+    """ handles POST i.e. tare command """
+    async def render_post(self, request):
+        async with self._lock:
+            self._hx711.tare()
+        return Message(code=CHANGED)
 
     """ start/stop polling cycle """
     def update_observation_count(self, count):
@@ -49,19 +56,21 @@ class LoadCellSensor(ObservableResource):
             self._handle = None
 
     """ read physical load cell """
-    def _read_load_cell(self):
-        return self._hx711.get_weight()
+    async def _read_load_cell(self):
+        async with self._lock:
+            return self._hx711.get_weight()
 
     """ polling cycle """
-    def _poll(self):
-        self._handle = asyncio.get_event_loop().call_later(self._poll_period, self._poll)
-        weight = self._read_load_cell()
+    async def _poll(self):
+        await asyncio.sleep(self._poll_period)
+        self._handle = asyncio.get_event_loop().create_task(self._poll())
+        weight = await self._read_load_cell()
         message = Message(payload=cbor2.dumps(weight), code=CONTENT)        
         self.updated_state(message)
 
     """ initiate polling cycle """
     def _start_polling(self):
-        self._handle = asyncio.get_event_loop().call_later(self._poll_period, self._poll)
+        self._handle = asyncio.get_event_loop().create_task(self._poll())
 
 
 def get_command_line_arguments():
@@ -71,10 +80,14 @@ def get_command_line_arguments():
                         help='GPIO pin: forwarded to HX711 constructor', required=True)
     required.add_argument('--pd_sck', dest='pd_sck', type=int,
                         help='GPIO pin: forwarded to HX711 constructor', required=True)
-    parser.add_argument('--port', dest='port', type=int, help='CoAP port (default: %i)' % COAP_PORT, default=COAP_PORT)
-    parser.add_argument('--rd', dest='rd', help='Resource directory base URI (default: coap://localhost)', default='coap://localhost')
-    parser.add_argument('--ref-unit', dest='ref_unit', type=float, help='HX711 reference unit (default: 1.0)', default=1.0)
-    parser.add_argument('--title', dest='title', help='Resource title given to Resource Directory', default="")
+    parser.add_argument('--port', dest='port', type=int,
+                        help='CoAP port (default: %i)' % COAP_PORT, default=COAP_PORT)
+    parser.add_argument('--rd', dest='rd',help='Resource directory base URI (default: coap://localhost)',
+                        default='coap://localhost')
+    parser.add_argument('--ref-unit', dest='ref_unit', type=float,
+                        help='HX711 reference unit (default: 1.0)', default=1.0)
+    parser.add_argument('--title', dest='title', help='Resource title given to Resource Directory',
+                        default="")
     return parser.parse_args()
 
 

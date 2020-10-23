@@ -26,6 +26,12 @@ To test the server
 aiocoap-client coap://localhost:PORT/weight | python3 -m cbor2.tool
 ```
 
+To tare the load cell
+
+```
+aiocoap-client -m POST coap://localhost:PORT/weight
+```
+
 ## Resource Directory
 
 Going to use aiocoap's implementation.
