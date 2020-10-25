@@ -59,6 +59,12 @@ aiocoap-client coap://localhost/resource-lookup/?rt=weight
 # example output: <coap://[::1]:5686/weight>;rt="load weight";obs;title="brady";anchor="coap://[::1]:5686"
 ```
 
+## Observe data from WebSocket Server
+
+```
+python3 -m websockets ws://localhost:port/
+```
+
 ## UI
 
 When we get to the UI, [cbor-js](https://github.com/paroga/cbor-js) can decode CBOR data sent from the WebSocket server.
