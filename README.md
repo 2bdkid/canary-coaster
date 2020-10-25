@@ -39,7 +39,7 @@ Details: [CoRE Resource Directory](https://tools.ietf.org/html/draft-ietf-core-r
 Note: This is hardcoded to run on the well-known CoAP port.
 
 ```
-python3 -m aiocoap.cli.rd
+aiocoap-rd
 ```
 
 To test the RD (once CoAP server has registered)
