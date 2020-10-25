@@ -25,7 +25,7 @@ To test the server
 ```
 pip3 install --user pygments
 pip3 install --user termcolor
-aiocoap-client --observe --pretty-print coap://localhost:PORT/weight
+aiocoap-client --observe --pretty-print --quiet coap://localhost:PORT/weight
 ```
 
 To tare the load cell
