@@ -38,7 +38,7 @@ class LoadCellSensor(ObservableResource):
     """ handles GET requests """
     async def render_get(self, request):
         weight = await self._read_load_cell()
-        return Message(payload=cbor2.dumps(weight))
+        return Message(payload=cbor2.dumps(weight), content_format=60)
 
     """ handles POST i.e. tare command """
     async def render_post(self, request):
@@ -62,7 +62,7 @@ class LoadCellSensor(ObservableResource):
         while True:
             await asyncio.sleep(self._poll_period)
             weight = await self._read_load_cell()
-            message = Message(payload=cbor2.dumps(weight), code=CONTENT)
+            message = Message(payload=cbor2.dumps(weight), code=CONTENT, content_format=60)
             self.updated_state(message)
 
     """ initiate polling cycle """
