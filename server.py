@@ -37,7 +37,7 @@ class LoadCellSensor(ObservableResource):
 
     """ handles GET requests """
     async def render_get(self, request):
-        weight = await self._read_load_cell()
+        weight = self.weight
         return Message(payload=cbor2.dumps(weight), content_format=60)
 
     """ handles POST i.e. tare command """
@@ -54,14 +54,15 @@ class LoadCellSensor(ObservableResource):
             self._handle = None
 
     """ read physical load cell """
-    def _read_load_cell(self):
+    @property
+    def weight(self):
         return self._hx711.get_weight()
 
     """ polling cycle """
     async def _poll(self):
         while True:
             await asyncio.sleep(self._poll_period)
-            weight = self._read_load_cell()
+            weight = self.weight
             message = Message(payload=cbor2.dumps(weight), code=CONTENT, content_format=60)
             self.updated_state(message)
 
