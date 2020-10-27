@@ -17,9 +17,8 @@ from hx711 import HX711
 
 
 class LoadCellSensor(ObservableResource):
-
-    """ takes HX711 object as input
-        poll sensor every poll_period seconds
+    """ Construct LoadCellSensor with HX711 object.
+        Polls sensor every poll_period seconds.
     """
     def __init__(self, hx711, poll_period, title):
         super().__init__()
@@ -29,45 +28,49 @@ class LoadCellSensor(ObservableResource):
         self.rt = 'load weight'
         self.title = title
 
-    """ add title to sensor description """
     def get_link_description(self):
+        """ Returns dict of options suitable for LinkFormat.
+            Includes title of sensor.
+        """
         desc = super().get_link_description()
         desc['title'] = self.title
         return desc
 
-    """ handles GET requests """
     async def render_get(self, request):
+        """ Returns Message with sensor weight reading encoded in CBOR."""
         weight = self.weight
         return Message(payload=cbor2.dumps(weight), content_format=60)
 
-    """ handles POST i.e. tare command """
     async def render_post(self, request):
+        """ Tare sensor and return CHANGED Message."""
         self._hx711.tare()
         return Message(code=CHANGED)
 
-    """ start/stop polling cycle """
     def update_observation_count(self, count):
+        """ starts/stops polling cycle as observations come."""
         if count and self._handle is None:
             self._start_polling()
         if count == 0 and self._handle:
             self._handle.cancel()
             self._handle = None
 
-    """ read physical load cell """
     @property
     def weight(self):
+        """ Returns physical load cell reading."""
         return self._hx711.get_weight()
 
-    """ polling cycle """
     async def _poll(self):
+        """ Does 1 iteration of the polling cycle and returns Message
+            with sensor weight in CBOR encoding.
+        """
         while True:
             await asyncio.sleep(self._poll_period)
             weight = self.weight
             message = Message(payload=cbor2.dumps(weight), code=CONTENT, content_format=60)
             self.updated_state(message)
 
-    """ initiate polling cycle """
     def _start_polling(self):
+        """ Starts the polling cycle."""
         self._handle = asyncio.get_event_loop().create_task(self._poll())
 
 
