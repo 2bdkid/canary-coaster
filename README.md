@@ -17,7 +17,7 @@ cd ..
 pip3 install --user cbor2
 chmod +x server.py
 ./server.py -h  # look at the extra options
-./server.py --dout X --pd_sck Y  --port PORT  # GPIO pins X, Y
+./server.py --dout X --pd_sck Y --rd coap://rd-ip --port PORT  # GPIO pins X, Y
 ```
 
 To test the server
