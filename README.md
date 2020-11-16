@@ -15,6 +15,7 @@ cd hx711py
 pip3 install --user .
 cd ..
 pip3 install --user cbor2
+pip3 install --user LinkHeader
 chmod +x server.py
 ./server.py -h  # look at the extra options
 ./server.py --dout X --pd_sck Y --rd coap://rd-ip --port PORT  # GPIO pins X, Y
