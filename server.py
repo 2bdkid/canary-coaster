@@ -26,6 +26,7 @@ class LoadCellSensor(ObservableResource):
         self._hx711 = hx711
         self._handle = None
         self.rt = 'load weight'
+        self.ct = 60
         self.title = title
 
     def get_link_description(self):
