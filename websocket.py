@@ -22,7 +22,7 @@ async def start_websocket_server(uri, port):
         while True:
             try:
                 await websocket.send(cbor.dumps(weights))
-		await asyncio.sleep(1)
+                await asyncio.sleep(1)
             except ConnectionClosed:
                 break
 
