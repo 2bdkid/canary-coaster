@@ -15,9 +15,10 @@ cd hx711py
 pip3 install --user .
 cd ..
 pip3 install --user cbor2
+
 chmod +x server.py
 ./server.py -h  # look at the extra options
-./server.py --dout X --pd_sck Y  --port PORT  # GPIO pins X, Y
+./server.py --dout X --pd_sck Y --rd coap://rd-ip --port PORT  # GPIO pins X, Y
 ```
 
 To test the server
@@ -25,6 +26,7 @@ To test the server
 ```
 pip3 install --user pygments
 pip3 install --user termcolor
+pip3 install --user LinkHeader
 aiocoap-client --observe --pretty-print --quiet coap://localhost:PORT/weight
 ```
 
