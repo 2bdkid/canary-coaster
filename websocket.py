@@ -16,7 +16,8 @@ from aiocoap.util.linkformat import parse as Parse
 async def start_websocket_server(uri, port):
     queues = set()
     weights = {}
-
+    observation_handles = set()
+    
     """ send temperature notifications from queue """
     async def send_temperature_notifications(websocket, path):
         """ ignore received messages to prevent queue overflow """
@@ -55,15 +56,16 @@ async def start_websocket_server(uri, port):
         resources = json.loads(myJson)
        
         for resource in resources:
-            asyncio.create_task(start_node_observation(resource['href'], resource['title']))
+            handle = asyncio.create_task(start_node_observation(resource['href'], resource['title']))
+            observation_handles.add(handle)
 
         async for response in request.observation:
             link = str(response.payload.decode('ascii'))
             myJson = Parse(link).as_json_string()
             newResources = json.loads(myJson)
-            resources += newResources
             for resource in newResources:
-                asyncio.create_task(start_node_observation(resource['href'], resource['title']))
+                handle = asyncio.create_task(start_node_observation(resource['href'], resource['title']))
+                observation_handles.add(handle)
 
     async def start_node_observation(uri, title):
         protocol = await Context.create_client_context()
@@ -73,11 +75,8 @@ async def start_websocket_server(uri, port):
         
         weights[title] = cbor.loads(initResponse.payload)
 
-        print(weights);
- 
         async for response in request.observation:    
             weights[title] = cbor.loads(response.payload)
-
 
     await asyncio.gather(
         start_rd_observation(uri),
