@@ -14,35 +14,17 @@ from aiocoap import GET
 from aiocoap.util.linkformat import parse as Parse
 
 async def start_websocket_server(uri, port):
-    queues = set()
     weights = {}
     observation_handles = set()
     
-    """ send temperature notifications from queue """
-    async def send_temperature_notifications(websocket, path):
-        """ ignore received messages to prevent queue overflow """
-        async def ignore_recv():
-            while True:
-                try:
-                    await websocket.recv()
-                except ConnectionClosed:
-                    break
-                    
-        
-        queue = Queue()
-        queues.add(queue)
-        asyncio.create_task(ignore_recv())
-
+    """ send weights from websocket """
+    async def send_weights(websocket, path):
         while True:
             try:
-                temp = await queue.get()
-                await websocket.send(temp)
+                await websocket.send(cbor.dumps(weights))
+		await asyncio.sleep(1)
             except ConnectionClosed:
                 break
-            finally:
-                queue.task_done()
-
-        queues.remove(queue)
 
     """ make notifications available to websocket connections """
     async def start_rd_observation(uri):
@@ -80,7 +62,7 @@ async def start_websocket_server(uri, port):
 
     await asyncio.gather(
         start_rd_observation(uri),
-        #websockets.serve(send_temperature_notifications, port=port)
+        websockets.serve(send_weights, port=port)
     )
 
 def main():
