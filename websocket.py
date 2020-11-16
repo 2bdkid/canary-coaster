@@ -11,14 +11,37 @@ from asyncio.queues import Queue
 from aiocoap import Message
 from aiocoap import Context
 from aiocoap import GET
+from aiocoap import POST
 from aiocoap.util.linkformat import parse as Parse
 
-async def start_websocket_server(uri, port):
-    weights = {}
+
+""" query resource directory, start observations, listen for connections """
+async def start_websocket_server(query, port):
+    weights = {}  # title -> weight
+    uris = {}  # title -> URI
     observation_handles = set()
-    
+    protocol = await Context.create_client_context()
+
+    """ send tare (POST) to to coaster weight resource"""
+    async def send_tare_to_coaster(uri):
+        tare_command = Message(code=POST, uri=uri)
+        await protocol.request(tare_command).response
+
+    """ receive tare command from UI """
+    async def receive_tare(websocket):
+        while True:
+            try:
+                title = await websocket.recv()
+                asyncio.create_task(send_tare_to_coaster(uris[title]))
+            except KeyError:
+                print("WARNING: received tare unknown coaster", title)
+            except ConnectionClosed:
+                break
+
     """ send weights from websocket """
     async def send_weights(websocket, path):
+        receive_tare_handle = asyncio.create_task(receive_tare(websocket))
+
         while True:
             try:
                 await websocket.send(cbor.dumps(weights))
@@ -26,52 +49,57 @@ async def start_websocket_server(uri, port):
             except ConnectionClosed:
                 break
 
+        receive_tare_handle.cancel()
+
     """ make notifications available to websocket connections """
     async def start_rd_observation(uri):
-        protocol = await Context.create_client_context()
-        get_obs_req = Message(code=GET, uri=uri, observe=0)
-        request = protocol.request(get_obs_req)
-        initResponse = await request.response
-        
-        link = str(initResponse.payload.decode('ascii'))
-        myJson = Parse(link).as_json_string()
-        resources = json.loads(myJson)
-       
-        for resource in resources:
+        """ decode Message cbor payload to object """
+        def decode_cbor_payload(payload):
+            link = payload.decode('ascii')
+            myJson = Parse(link).as_json_string()
+            return json.loads(myJson)
+
+        """ start observation of resource """
+        def process_resource(resource):
+            uris[resource['title']] = resource['href']
             handle = asyncio.create_task(start_node_observation(resource['href'], resource['title']))
             observation_handles.add(handle)
 
-        async for response in request.observation:
-            link = str(response.payload.decode('ascii'))
-            myJson = Parse(link).as_json_string()
-            newResources = json.loads(myJson)
-            for resource in newResources:
-                handle = asyncio.create_task(start_node_observation(resource['href'], resource['title']))
-                observation_handles.add(handle)
-
-    async def start_node_observation(uri, title):
-        protocol = await Context.create_client_context()
         get_obs_req = Message(code=GET, uri=uri, observe=0)
         request = protocol.request(get_obs_req)
         initResponse = await request.response
-        
+        resources = decode_cbor_payload(initResponse.payload)
+
+        for resource in resources:
+            process_resource(resource)
+
+        async for response in request.observation:
+            newResources = decode_cbor_payload(response.payload)
+            for resource in newResources:
+                process_resource(resource)
+
+    """ observe coaster weight resource at uri with title """
+    async def start_node_observation(uri, title):
+        get_obs_req = Message(code=GET, uri=uri, observe=0)
+        request = protocol.request(get_obs_req)
+        initResponse = await request.response
         weights[title] = cbor.loads(initResponse.payload)
 
-        async for response in request.observation:    
+        async for response in request.observation:
             weights[title] = cbor.loads(response.payload)
 
     await asyncio.gather(
-        start_rd_observation(uri),
+        start_rd_observation(query),
         websockets.serve(send_weights, port=port)
     )
 
+
 def main():
     parser = argparse.ArgumentParser()
-    # Something like coap://<<IP>>:<<PORT>>/resource-lookup/?rt=weight
-    parser.add_argument('rd', help='CoAP resource directory URI to observe')
+    parser.add_argument('query', help='CoAP resource directory query URI')
     parser.add_argument('--port', dest='port', required=True, type=int, help='TCP port for websocket to be attached to')
     args = parser.parse_args()
-    asyncio.run(start_websocket_server(uri=args.rd, port=args.port))
+    asyncio.run(start_websocket_server(query=args.query, port=args.port))
 
 
 if __name__ == '__main__':
