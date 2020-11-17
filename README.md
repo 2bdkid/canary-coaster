@@ -27,7 +27,6 @@ To test the server
 ```
 pip3 install --user pygments
 pip3 install --user termcolor
-pip3 install --user LinkHeader
 aiocoap-client --observe --pretty-print --quiet coap://localhost:PORT/weight
 ```
 
@@ -50,16 +49,21 @@ aiocoap-rd
 To test the RD (once CoAP server has registered)
 
 ```
+pip3 install --user LinkHeader
 aiocoap-client coap://localhost/resource-lookup/?rt=weight
 ```
 
 ## WebSocket Server
 
-WebSocket server can query the Resource Directory for coasters weight resources and their title
+The WebSocket server queries the resource directory using the specified query URI, and observes all found resources.
+Readings received from these resources are made available to incoming WebSocket connections.
+Incomming connections may tare a scale by sending the title string of the scale, this informs the server to send a CoAP POST to the weight resource.
 
 ```
-aiocoap-client coap://localhost/resource-lookup/?rt=weight
-# example output: <coap://[::1]:5686/weight>;rt="load weight";obs;title="brady";anchor="coap://[::1]:5686"
+pip3 install --user LinkHeader
+./websocket.py --port 5688 coap://<rd-ip>/resource-lookup/?rt=weight
+```
+
 ```
 
 ## Observe data from WebSocket Server
