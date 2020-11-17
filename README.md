@@ -5,6 +5,7 @@
 The server requires the development version of aiocoap and a port of tatobari/hx711py to Python 3.
 Remember that the resource directory must run on the well-known CoAP port so choose a different port for the CoAP server.
 The server returns [CBOR](https://cbor.io) data.
+It is very important to set the ep name. The resource directory differentiates nodes based on it.
 
 ```
 git clone https://github.com/chrysn/aiocoap
@@ -18,7 +19,7 @@ pip3 install --user cbor2
 
 chmod +x server.py
 ./server.py -h  # look at the extra options
-./server.py --dout X --pd_sck Y --rd coap://rd-ip --port PORT  # GPIO pins X, Y
+./server.py --ep rpi --dout X --pd_sck Y --rd coap://rd-ip --port PORT  # GPIO pins X, Y
 ```
 
 To test the server
