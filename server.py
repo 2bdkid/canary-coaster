@@ -90,6 +90,7 @@ def get_command_line_arguments():
                         help='HX711 reference unit (default: 1.0)', default=1.0)
     parser.add_argument('--title', dest='title', help='Resource title given to Resource Directory',
                         default="")
+    parser.add_argument('--ep', dest='ep', help='EndPoint name', default=None)
     return parser.parse_args()
 
 
@@ -104,7 +105,10 @@ async def start_server(args):
     root.add_resource(['weight'], LoadCellSensor(hx711, 1, args.title))
 
     protocol = await Context.create_server_context(root, bind=('::', args.port))
-    registration = Registerer(protocol, rd=args.rd)
+    registration_parameters = {}
+    if args.ep is not None:
+        registration_parameters['ep'] = args.ep
+    registration = Registerer(protocol, rd=args.rd, registration_parameters=registration_parameters)
 
 
 def main():
