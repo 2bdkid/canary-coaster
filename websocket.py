@@ -53,7 +53,7 @@ async def start_websocket_server(query, port):
     """ make notifications available to websocket connections """
     async def start_rd_observation(uri):
         """ decode Message cbor payload to object """
-        def decode_cbor_payload(payload):
+        def decode_linkformat_payload(payload):
             link = payload.decode('ascii')
             myJson = Parse(link).as_json_string()
             return json.loads(myJson)
@@ -67,13 +67,13 @@ async def start_websocket_server(query, port):
         get_obs_req = Message(code=GET, uri=uri, observe=0)
         request = protocol.request(get_obs_req)
         initResponse = await request.response
-        resources = decode_cbor_payload(initResponse.payload)
+        resources = decode_linkformat_payload(initResponse.payload)
 
         for resource in resources:
             process_resource(resource)
 
         async for response in request.observation:
-            newResources = decode_cbor_payload(response.payload)
+            newResources = decode_linkformat_payload(response.payload)
             for resource in newResources:
                 process_resource(resource)
 
