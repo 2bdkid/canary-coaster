@@ -7,7 +7,6 @@ import json
 import cbor2 as cbor
 
 from websockets.exceptions import ConnectionClosed
-from asyncio.queues import Queue
 from aiocoap import Message
 from aiocoap import Context
 from aiocoap import GET
@@ -87,6 +86,10 @@ async def start_websocket_server(query, port):
 
         async for response in request.observation:
             weights[title] = cbor.loads(response.payload)
+
+        del weights[title]
+        del uris[title]
+
 
     await asyncio.gather(
         start_rd_observation(query),
