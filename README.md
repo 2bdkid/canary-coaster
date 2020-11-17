@@ -64,8 +64,6 @@ pip3 install --user LinkHeader
 ./websocket.py --port 5688 coap://<rd-ip>/resource-lookup/?rt=weight
 ```
 
-```
-
 ## Observe data from WebSocket Server
 
 ```
