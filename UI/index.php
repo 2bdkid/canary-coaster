@@ -15,7 +15,7 @@
 	</head>
 	<body class="landing">
 	
-	<script src="cbor-js/cbor.js" type="text/javascript"></script>
+	<script src="cbor.js" type="text/javascript"></script>
 	<script>
 		webSocket = new WebSocket("ws://50.90.141.26:5688");
 		webSocket.binaryType = "arraybuffer";
