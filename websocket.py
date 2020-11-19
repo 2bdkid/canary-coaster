@@ -28,18 +28,19 @@ async def start_websocket_server(query, port):
 
     """ receive tare command from UI """
     async def receive_tare(websocket):
-        while True:
-            try:
-                title = await websocket.recv()
-                asyncio.create_task(send_tare_to_coaster(uris[title]))
-            except KeyError:
-                print("WARNING: received tare unknown coaster", title)
-            except ConnectionClosed:
-                break
+        try:
+            async for title in websocket:
+                try:
+                    asyncio.create_task(send_tare_to_coaster(uris[title]))
+                except KeyError:
+                    print('WARNING: received tare unknown coaster', title)
+        except ConnectionClosed:
+            pass
+
 
     """ send weights from websocket """
     async def send_weights(websocket, path):
-        receive_tare_handle = asyncio.create_task(receive_tare(websocket))
+        receive_tare_task = asyncio.create_task(receive_tare(websocket))
 
         while True:
             try:
@@ -48,7 +49,7 @@ async def start_websocket_server(query, port):
             except ConnectionClosed:
                 break
 
-        receive_tare_handle.cancel()
+        receive_tare_task.cancel()
 
     """ make notifications available to websocket connections """
     async def start_rd_observation(uri):
@@ -89,7 +90,6 @@ async def start_websocket_server(query, port):
 
         del weights[title]
         del uris[title]
-
 
     await asyncio.gather(
         start_rd_observation(query),
