@@ -85,6 +85,7 @@ Note: This is a slight simplification. The registration process begins with a GE
 Provides `/weight` resource and returns CBOR data same as CoAP server. Defaults to port 80 unless you use `--port`.
 
 ```
+pip3 install --user bottle
 ./httpserver.py --ref-unit 441 --dout 23 --pd_sck 24
 ```
 
