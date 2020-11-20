@@ -94,3 +94,9 @@ Test data from the command line
 ```
 curl -s http://localhost/weight | python3 -m cbor2.tool
 ```
+
+See header
+
+```
+curl -s -i http://localhost/weight
+```
