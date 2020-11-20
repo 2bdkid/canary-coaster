@@ -79,3 +79,17 @@ When we get to the UI, [cbor-js](https://github.com/paroga/cbor-js) can decode C
 Note: This is a slight simplification. The registration process begins with a GET /.well-known/core to the RD, then the server chooses to POST to /resourcedirectory because its Resource-Type is core.rd
 
 ![Sequence Diagram](sequence.png)
+
+## HTTP Implementation of server
+
+Provides `/weight` resource and returns CBOR data same as CoAP server. Defaults to port 80 unless you use `--port`.
+
+```
+./httpserver.py --ref-unit 441 --dout 23 --pd_sck 24
+```
+
+Test data from the command line
+
+```
+curl -s http://localhost/weight | python3 -m cbor2.tool
+```
