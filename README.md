@@ -82,21 +82,27 @@ Note: This is a slight simplification. The registration process begins with a GE
 
 ## HTTP Implementation of server
 
-Provides `/weight` resource and returns CBOR data same as CoAP server. Defaults to port 80 unless you use `--port`.
+Provides `/weight` resource and returns CBOR data same as CoAP server. Defaults to localhost port 80 unless you use `--bind`/`--port`.
 
 ```
 pip3 install --user bottle
 ./httpserver.py --ref-unit 441 --dout 23 --pd_sck 24
 ```
 
-Test data from the command line
+Request weight from the command line
 
 ```
 curl -s http://localhost/weight | python3 -m cbor2.tool
 ```
 
-See header
+See response header
 
 ```
 curl -s -i http://localhost/weight
+```
+
+Tare scale
+
+```
+curl -X POST http://localhost/weight
 ```
