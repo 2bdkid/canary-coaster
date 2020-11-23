@@ -3,7 +3,7 @@
 import cbor2
 import argparse
 
-from bottle import route, run, template, response
+from bottle import route, run, template, response, post
 from hx711 import HX711
 
 
@@ -13,6 +13,10 @@ def start_server(hx711, bind, port):
         t = hx711.get_weight()
         response.set_header('Content-Type', 'application/cbor')
         return cbor2.dumps(t)
+
+    @post('/weight')
+    def tare():
+        hx711.tare()
 
     run(host=bind, port=port)
 
@@ -33,6 +37,7 @@ def main():
 
     hx711 = HX711(args.dout, args.pd_sck)
     hx711.set_reference_unit(args.ref_unit)
+    hx711.tare()
     start_server(hx711, args.bind, args.port)
 
 
