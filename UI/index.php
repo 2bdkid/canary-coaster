@@ -1,10 +1,4 @@
 <!DOCTYPE HTML>
-<!--
-	Author: Jake Waggoner
-	Template Used: Spatial
-	Date: 9-5-2020
-	Filename: lab1.php
--->
 <html>
 	<link rel="shortcut icon" type="image/ico" href="images/canary.jpg">
 	<head>
@@ -21,52 +15,89 @@
 		webSocket.binaryType = "arraybuffer";
 		webSocket.onmessage = function (event) {
 			weights = CBOR.decode(event.data);
-			
-			document.getElementById("data").innerHTML = "";
-			document.getElementById("tareButton").innerHTML = "";
+			var pathToImage = "images/";
 			for(const [key, value] of Object.entries(weights))
 			{
+				if(document.body.contains(document.getElementById(key)) == false)
+				{
+					var container = document.getElementById("head");
+				
+					var wrapper = document.createElement("DIV");
+					wrapper.className = "2u"; //For grid-like layout
+					wrapper.id = key;
+
+					var spacer = document.createElement("DIV");
+					spacer.className = "1u";
+
+					var image = document.createElement("IMG");
+					image.src = pathToImage+"X.png";
+					image.id = key+"_img";
+					image.style.height = "180px";
+					image.style.width = "123px";
+
+					var form = document.createElement("FORM");
+					form.setAttribute("method", "post");
+						var label = document.createElement("STRONG");
+						label.innerText = "Drink Type";
+						form.appendChild(label);
+
+						var input = document.createElement("INPUT");
+						input.type = "text";
+						input.placeholder = "Enter the drink here"
+						input.id = key+"_input";
+						input.value = sessionStorage.getItem(key);
+						form.appendChild(input);
+						input.addEventListener("click", function(){input.classList.toggle("active");});
+
+						var saveButton = document.createElement("BUTTON");
+						saveButton.innerHTML = "Save drink type";
+						saveButton.addEventListener("click",function(){sessionStorage.setItem(key, input.value); input.value = sessionStorage.getItem(key);})
+						form.appendChild(saveButton);
+
+					var button = document.createElement("BUTTON");
+					button.innerHTML = "Tare "+key;
+					button.addEventListener("click",function(){webSocket.send(key);});
+
+					wrapper.appendChild(image);
+					wrapper.appendChild(form);
+					wrapper.appendChild(button);
+					container.appendChild(spacer);
+					container.appendChild(wrapper);
+				}
+
 				var weight = parseFloat(value).toFixed(2);
-				var image = document.getElementById("cup");
-				var pathToImage = "images/";
+				var image = document.getElementById(key+"_img");
+				weight = 700;
 				if(weight > 670)
 				{
 					image.src = pathToImage+"FullGlass.PNG";
-					image.style.height = "180px";
-					image.style.width = "123px";
+					image.title = "Glass is full!";
 				}
 				else if(weight > 600 && weight <= 670)
 				{
 					image.src = pathToImage+"MostlyFullGlass.PNG";
-					image.style.height = "180px";
-					image.style.width = "123px";
+					image.title = "Glass is mostly full!";
 				}
 				else if(weight > 530 && weight <= 600)
 				{
 					image.src = pathToImage+"HalfWayFullGlass.PNG";
-					image.style.height = "180px";
-					image.style.width = "123px";
+					image.title = "Glass is halfway full!";
 				}
 				else if(weight > 430 && weight <= 530)
 				{
 					image.src = pathToImage+"MostlyEmptyGlass.PNG";
-					image.style.height = "180px";
-					image.style.width = "123px";
+					image.title = "Glass is mostly empty!";
 				}
 				else if(weight > 320 && weight <= 430)
 				{
-					image.src = pathToImage+"EmptyGlass.PNG";
-					image.style.height = "180px";
-					image.style.width = "123px";
+					image.src = pathToImage+"ExlamGlass.png";
+					image.title = "Glass is empty and needs to be refilled!";
 				}
 				else
 				{
 					image.src = pathToImage+"X.png";
-					image.style.height = "110px";
-					image.style.width = "110px";
+					image.title = "Drink is not on the coaster";
 				}
-				document.getElementById("data").innerHTML += key + ": " + parseFloat(value).toFixed(2);
-				document.getElementById("tareButton").innerHTML += '<button onclick="webSocket.send(`'+key+'`)">Tare '+key+'</button>';
 			}
 		}
 	</script>
@@ -78,12 +109,9 @@
 			</section>
 
 			<section id="one" class="wrapper style1">
-				<div class="container">
-					<header class="major">
-						<img id="cup" src="images/FullGlass.PNG"><br>
-						<p id="data" name="data">Data</p>
-						<div id="tareButton" name = "tareButton"></div>
-					</header>
+				<div class="box alt">
+					<div class="row uniform 25%" id="head">
+					</div>
 				</div>
 			</section>
 			
