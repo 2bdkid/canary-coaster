@@ -9,6 +9,7 @@ services:
       - canary-rd
     devices:
       - "/dev/gpiomem:/dev/gpiomem"
+    image: 2bdkid/canary:latest
     environment:
       - EP=epi
       - DOUT=23
@@ -20,6 +21,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.rd
+    image: 2bdkid/canary-rd:latest
     networks:
       canary-net:
         aliases:
@@ -28,6 +30,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ws
+    image: 2bdkid/canary-ws:latest
     ports:
       - "5688:5688"
     networks:
