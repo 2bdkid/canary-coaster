@@ -1,0 +1,46 @@
+version: "3.6"
+
+services:
+  canary:
+    build: .
+    ports:
+      - "5684:5683"
+    networks:
+      canary-net:
+    depends_on:
+      - canary-rd
+    devices:
+      - "/dev/gpiomem:/dev/gpiomem"
+    environment:
+      - EP=epi
+      - DOUT=23
+      - PD_SCK=24
+      - RD=coap://rd
+      - TITLE=rpi
+      - REF_UNIT=441
+  canary-rd:
+    build:
+      context: .
+      dockerfile: Dockerfile.rd
+    ports:
+      - "5683:5683"
+    networks:
+      canary-net:
+        aliases:
+          - rd
+  canary-ws:
+    build:
+      context: .
+      dockerfile: Dockerfile.ws
+    ports:
+      - "5688:5688"
+    networks:
+      canary-net:
+    depends_on:
+      - canary-rd
+    environment:
+      - PORT=5688
+      - RD=coap://rd/resource-lookup/?rt=weight
+
+networks:
+  canary-net:
