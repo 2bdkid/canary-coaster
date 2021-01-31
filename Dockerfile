@@ -22,4 +22,5 @@ CMD python server.py --ep ${EP:-rpi}\
                      --dout ${DOUT:-23} \
                      --pd_sck ${PD_SCK:-24} \
                      --rd ${RD:-coap://rd} \
-                     --title ${TITLE:-rpi}
+                     --title ${TITLE:-rpi} \
+                     --ref-unit ${REF_UNIT:-441}
