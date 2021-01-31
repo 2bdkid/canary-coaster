@@ -3,8 +3,6 @@ version: "3.6"
 services:
   canary:
     build: .
-    ports:
-      - "5684:5683"
     networks:
       canary-net:
     depends_on:
@@ -22,8 +20,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.rd
-    ports:
-      - "5683:5683"
     networks:
       canary-net:
         aliases:
