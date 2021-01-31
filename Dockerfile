@@ -19,6 +19,7 @@ WORKDIR /root
 COPY ./server.py .
 
 CMD python server.py --ep ${EP:-rpi}\
-                       --dout ${DOUT:-23} \
-		       --pd_sck ${PD_SCK:-24} \
-		       --rd ${RD:-coap://rd}
+                     --dout ${DOUT:-23} \
+                     --pd_sck ${PD_SCK:-24} \
+                     --rd ${RD:-coap://rd} \
+                     --title ${TITLE:-rpi}
