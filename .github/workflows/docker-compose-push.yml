@@ -1,0 +1,25 @@
+name: Docker compose push
+
+on: push
+
+jobs:
+  docker-compose-push:
+    name: Docker compose push
+    runs-on: ubuntu-latest
+    environment: CI
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Docker login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker compose build
+        run: docker-compose build
+
+      - name: Docker compose push
+        run: docker-compose push
